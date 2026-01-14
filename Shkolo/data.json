@@ -1,0 +1,306 @@
+[
+    {
+        "FirstName": "Alexander",
+        "LastName": "Petrov",
+        "Class": "10A",
+        "Grades": [
+            {
+                "SubjectName": "Math",
+                "Score": 6
+            },
+            {
+                "SubjectName": "History",
+                "Score": 4
+            },
+            {
+                "SubjectName": "Physics",
+                "Score": 5
+            }
+        ]
+    },
+    {
+        "FirstName": "Asen",
+        "LastName": "Ivanov",
+        "Class": "10A",
+        "Grades": [
+            {
+                "SubjectName": "History",
+                "Score": 4
+            },
+            {
+                "SubjectName": "Math",
+                "Score": 3
+            }
+        ]
+    },
+    {
+        "FirstName": "Boryana",
+        "LastName": "Slavova",
+        "Class": "11B",
+        "Grades": [
+            {
+                "SubjectName": "Physics",
+                "Score": 6
+            },
+            {
+                "SubjectName": "Math",
+                "Score": 6
+            }
+        ]
+    },
+    {
+        "FirstName": "Dimitar",
+        "LastName": "Berbatov",
+        "Class": "11B",
+        "Grades": [
+            {
+                "SubjectName": "History",
+                "Score": 2
+            },
+            {
+                "SubjectName": "Physics",
+                "Score": 3
+            }
+        ]
+    },
+    {
+        "FirstName": "Elena",
+        "LastName": "Stoyanova",
+        "Class": "10A",
+        "Grades": [
+            {
+                "SubjectName": "Math",
+                "Score": 5
+            },
+            {
+                "SubjectName": "History",
+                "Score": 5
+            }
+        ]
+    },
+    {
+        "FirstName": "Georgi",
+        "LastName": "Nikolov",
+        "Class": "8A",
+        "Grades": [
+            {
+                "SubjectName": "Math",
+                "Score": 4
+            },
+            {
+                "SubjectName": "Biology",
+                "Score": 5
+            }
+        ]
+    },
+    {
+        "FirstName": "Ivana",
+        "LastName": "Petkova",
+        "Class": "8A",
+        "Grades": [
+            {
+                "SubjectName": "History",
+                "Score": 6
+            },
+            {
+                "SubjectName": "Math",
+                "Score": 5
+            }
+        ]
+    },
+    {
+        "FirstName": "Martin",
+        "LastName": "Dimitrov",
+        "Class": "8B",
+        "Grades": [
+            {
+                "SubjectName": "Physics",
+                "Score": 3
+            },
+            {
+                "SubjectName": "Math",
+                "Score": 4
+            }
+        ]
+    },
+    {
+        "FirstName": "Viktoria",
+        "LastName": "Koleva",
+        "Class": "8B",
+        "Grades": [
+            {
+                "SubjectName": "Biology",
+                "Score": 6
+            },
+            {
+                "SubjectName": "Chemistry",
+                "Score": 5
+            }
+        ]
+    },
+    {
+        "FirstName": "Stefan",
+        "LastName": "Hristov",
+        "Class": "9A",
+        "Grades": [
+            {
+                "SubjectName": "Math",
+                "Score": 5
+            },
+            {
+                "SubjectName": "Physics",
+                "Score": 5
+            }
+        ]
+    },
+    {
+        "FirstName": "Nadezhda",
+        "LastName": "Ilieva",
+        "Class": "9A",
+        "Grades": [
+            {
+                "SubjectName": "History",
+                "Score": 6
+            },
+            {
+                "SubjectName": "Biology",
+                "Score": 6
+            }
+        ]
+    },
+    {
+        "FirstName": "Radoslav",
+        "LastName": "Todorov",
+        "Class": "9B",
+        "Grades": [
+            {
+                "SubjectName": "Math",
+                "Score": 2
+            },
+            {
+                "SubjectName": "Physics",
+                "Score": 3
+            }
+        ]
+    },
+    {
+        "FirstName": "Simona",
+        "LastName": "Vasileva",
+        "Class": "9B",
+        "Grades": [
+            {
+                "SubjectName": "Chemistry",
+                "Score": 5
+            },
+            {
+                "SubjectName": "Math",
+                "Score": 4
+            }
+        ]
+    },
+    {
+        "FirstName": "Plamen",
+        "LastName": "Georgiev",
+        "Class": "10B",
+        "Grades": [
+            {
+                "SubjectName": "Math",
+                "Score": 6
+            },
+            {
+                "SubjectName": "Physics",
+                "Score": 6
+            }
+        ]
+    },
+    {
+        "FirstName": "Daniela",
+        "LastName": "Marinova",
+        "Class": "10B",
+        "Grades": [
+            {
+                "SubjectName": "History",
+                "Score": 5
+            },
+            {
+                "SubjectName": "Biology",
+                "Score": 6
+            }
+        ]
+    },
+    {
+        "FirstName": "Kaloyan",
+        "LastName": "Ivanov",
+        "Class": "11B",
+        "Grades": [
+            {
+                "SubjectName": "History",
+                "Score": 6
+            },
+            {
+                "SubjectName": "Math",
+                "Score": 5
+            }
+        ]
+    },
+    {
+        "FirstName": "Radost",
+        "LastName": "Popova",
+        "Class": "11B",
+        "Grades": [
+            {
+                "SubjectName": "Chemistry",
+                "Score": 4
+            },
+            {
+                "SubjectName": "Physics",
+                "Score": 5
+            }
+        ]
+    },
+    {
+        "FirstName": "Hristo",
+        "LastName": "Stoichkov",
+        "Class": "12C",
+        "Grades": [
+            {
+                "SubjectName": "Math",
+                "Score": 4
+            },
+            {
+                "SubjectName": "History",
+                "Score": 4
+            }
+        ]
+    },
+    {
+        "FirstName": "Iva",
+        "LastName": "Mladenova",
+        "Class": "12C",
+        "Grades": [
+            {
+                "SubjectName": "Physics",
+                "Score": 5
+            },
+            {
+                "SubjectName": "Math",
+                "Score": 4
+            }
+        ]
+    },
+    {
+        "FirstName": "Yavor",
+        "LastName": "Denev",
+        "Class": "12C",
+        "Grades": [
+            {
+                "SubjectName": "History",
+                "Score": 4
+            },
+            {
+                "SubjectName": "Physics",
+                "Score": 2
+            }
+        ]
+    }
+]

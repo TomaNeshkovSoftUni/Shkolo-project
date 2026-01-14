@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Shkolo.Data/Shkolo.Data.csproj" />
+  <Project Path="Shkolo/Shkolo.App.csproj" />
+</Solution>
