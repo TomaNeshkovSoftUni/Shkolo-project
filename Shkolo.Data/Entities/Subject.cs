@@ -16,5 +16,7 @@ namespace Shkolo.Data.Entities
 
         // Many-to-Many: One Subject has many Students
         public virtual ICollection<Student> Students { get; set; } = new HashSet<Student>();
+
+        public virtual ICollection<Grade> Grades { get; set; } = new HashSet<Grade>();
     }
 }

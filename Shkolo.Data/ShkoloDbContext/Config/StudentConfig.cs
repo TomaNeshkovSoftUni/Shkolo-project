@@ -11,8 +11,11 @@ namespace Shkolo.Data.ShkoloDbContext.Config
     {
         public void Configure(EntityTypeBuilder<Student> builder)
         {
+            // Simple many-to-many config
+
             builder.HasMany(s => s.Subjects)
                    .WithMany(sub => sub.Students);
+
         }
     }
 }

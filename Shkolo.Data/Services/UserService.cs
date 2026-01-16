@@ -4,58 +4,58 @@ using System.Linq;
 using Shkolo.Data.DTOs;
 using Shkolo.Data.Entities;
 using Shkolo.Data.Entities.Enums;
+using Shkolo.Data.ShkoloDbContext;
 
 namespace Shkolo.Data.Services
 {
+    // UserService handles User accounts and Admin tasks
     public class UserService
     {
         private readonly ShkoloContext _context;
 
-        public UserService()
+        public UserService(ShkoloContext context)
         {
-            _context = new ShkoloContext();
+            _context = context;
         }
 
-        // --- 1. LOGIN ---
+        // Login logic: Validates credentials and checks if user is Blocked
         public UserDto? Authenticate(string username, string password)
         {
             var user = _context.Users
                 .FirstOrDefault(u => u.Username == username && u.Password == password);
 
-            // Access Check: Invalid credentials OR Blocked status prevents login
             if (user == null || user.Status == UserStatus.Blocked)
                 return null;
 
+            // Returns DTO to hide sensitive data (like Password) from the UI
             return new UserDto
             {
                 Username = user.Username,
-                Role = user.Role
+                Role = user.Role,
+                Status = user.Status
             };
         }
 
-        // --- 2. REGISTER (Matches Requirement: RegisteredUser) ---
+        // Registration: Checks for unique username and sets default role
         public string Register(string username, string password)
         {
-            // Unique Username Check (Requirement: Username must be unique)
             if (_context.Users.Any(u => u.Username == username))
-                return "Error: Username already exists!";
+                return "Error: Username taken.";
 
             var newUser = new User
             {
                 Username = username,
                 Password = password,
-                Role = Role.RegisteredUser, // All app-created accounts are RegisteredUsers
+                Role = Role.RegisteredUser,
                 Status = UserStatus.Active
             };
 
             _context.Users.Add(newUser);
             _context.SaveChanges();
-            return "Success: Account created! You can now login.";
+            return "Account created!";
         }
 
-        // --- 3. ADMINISTRATOR ACTIONS ---
-
-        // List all users for the Admin menu
+        // Admin Action: List all system users
         public List<UserDto> GetAllUsers()
         {
             return _context.Users
@@ -68,12 +68,11 @@ namespace Shkolo.Data.Services
                 .ToList();
         }
 
-        // Change Status (Requirement: Admin blocks users)
+        // Admin Action: Block a user (Safety check: Admins cannot block other Admins)
         public bool ChangeUserStatus(string username, UserStatus newStatus)
         {
             var user = _context.Users.FirstOrDefault(u => u.Username == username);
 
-            // Protection: Cannot block yourself/other admins
             if (user == null || user.Role == Role.Administrator)
                 return false;
 
@@ -82,12 +81,11 @@ namespace Shkolo.Data.Services
             return true;
         }
 
-        // Delete (Requirement: Admin deletes users)
+        // Admin Action: Delete a user
         public bool DeleteUser(string username)
         {
             var user = _context.Users.FirstOrDefault(u => u.Username == username);
 
-            // Protection: Cannot delete the admin account via this menu
             if (user == null || user.Role == Role.Administrator)
                 return false;
 

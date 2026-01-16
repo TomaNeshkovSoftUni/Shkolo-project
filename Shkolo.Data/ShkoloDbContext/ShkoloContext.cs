@@ -12,6 +12,7 @@ namespace Shkolo.Data
         public ShkoloContext(DbContextOptions<ShkoloContext> options)
             : base(options) { }
 
+        // --- Database Tables ---
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<Student> Students { get; set; } = null!;
         public DbSet<Teacher> Teachers { get; set; } = null!;
@@ -23,6 +24,7 @@ namespace Shkolo.Data
         {
             if (!optionsBuilder.IsConfigured)
             {
+                // Default connection string for local SQL Server // Change if using docker/other setup
                 optionsBuilder.UseSqlServer("Server=.;Database=ShkoloDB;Trusted_Connection=True;TrustServerCertificate=True;");
             }
         }
@@ -31,11 +33,8 @@ namespace Shkolo.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // This automatically applies all configurations in the assembly
+            // Automatically loads all IEntityTypeConfiguration classes (in Config folder)
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ShkoloContext).Assembly);
-
-            // Note: If your Config folder is in a different assembly, 
-            // you can use: modelBuilder.ApplyConfiguration(new UserConfig()); for each one.
         }
     }
 }

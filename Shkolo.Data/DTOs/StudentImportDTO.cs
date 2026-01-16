@@ -12,6 +12,8 @@ namespace Shkolo.Data.DTOs
         public string LastName { get; set; } = null!;
         public string Class { get; set; } = null!;
         public List<GradeImportDto> Grades { get; set; } = new();
+
+        //Added grade collection
     }
 
     public class GradeImportDto

@@ -1,25 +1,28 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using Shkolo.Data.Services;
-using Shkolo.Data;
 using Shkolo.Data.DTOs;
-using Shkolo.Data.Entities;
 using Shkolo.Data.Entities.Enums;
+using Shkolo.Data.Services;
+using Shkolo.Data.ShkoloDbContext;
 
 namespace Shkolo.App
 {
+    // This is the App layer (ProjectName.App)
+    // It only handles the console and DTOs, never the raw database Entities
     class Program
     {
         static void Main(string[] args)
         {
-            var userService = new UserService();
-            using var context = new ShkoloContext();
+            // Set up the connection to our Data project
+            using var context = new Shkolo.Data.ShkoloContext();
+            var userService = new UserService(context);
             var importer = new DataImporterService(context);
+
             UserDto loggedInUser = null;
 
-            // --- 1. START SCREEN (Login / Register / Guest) ---
+            // START SCREEN: Login / Register / Guest logic
             while (loggedInUser == null)
             {
                 Console.Clear();
@@ -35,8 +38,15 @@ namespace Shkolo.App
                 {
                     Console.Write("Username: "); string u = Console.ReadLine();
                     Console.Write("Password: "); string p = Console.ReadLine();
+
+                    // Auth returns a DTO to keep the App layer clean
                     loggedInUser = userService.Authenticate(u, p);
-                    if (loggedInUser == null) { Console.WriteLine("Invalid credentials or Blocked!"); Console.ReadKey(); }
+
+                    if (loggedInUser == null)
+                    {
+                        Console.WriteLine("Invalid credentials or Blocked! Press any key...");
+                        Console.ReadKey();
+                    }
                 }
                 else if (entry == "2")
                 {
@@ -47,12 +57,13 @@ namespace Shkolo.App
                 }
                 else if (entry == "3")
                 {
+                    // Guest role has limited menu options
                     loggedInUser = new UserDto { Username = "Guest", Role = Role.Guest };
                 }
                 else if (entry == "0") return;
             }
 
-            // --- 2. MAIN MENU LOOP ---
+            // MAIN MENU: Different options show up depending on User Role
             while (true)
             {
                 Console.Clear();
@@ -61,12 +72,14 @@ namespace Shkolo.App
 
                 if (loggedInUser.Role == Role.Administrator)
                 {
+                    // Admin can ONLY manage users, no school data access
                     Console.WriteLine("1. List All Users");
                     Console.WriteLine("2. Block User");
                     Console.WriteLine("3. Delete User");
                 }
                 else if (loggedInUser.Role == Role.RegisteredUser)
                 {
+                    // Registered Users get JSON import/export and all LINQ reports
                     Console.WriteLine("1. Import Students (JSON)");
                     Console.WriteLine("2. Export Top Students (JSON)");
                     Console.WriteLine("3. Search Student by Name");
@@ -78,7 +91,8 @@ namespace Shkolo.App
                 }
                 else if (loggedInUser.Role == Role.Guest)
                 {
-                    Console.WriteLine("1. View School Classes (Read-Only)");
+                    // Guests only see read-only public info
+                    Console.WriteLine("1. View School Classes");
                 }
 
                 Console.WriteLine("0. Logout/Exit");
@@ -86,15 +100,16 @@ namespace Shkolo.App
                 string choice = Console.ReadLine();
                 if (choice == "0") break;
 
-                HandleMenuSelection(choice, loggedInUser, userService, importer);
+                HandleMenuSelection(choice, loggedInUser, userService, importer, context);
+
                 Console.WriteLine("\nPress any key...");
                 Console.ReadKey();
             }
         }
 
-        static void HandleMenuSelection(string choice, UserDto user, UserService uService, DataImporterService importer)
+        // This method separates the menu logic from the Main loop
+        static void HandleMenuSelection(string choice, UserDto user, UserService uService, DataImporterService importer, Shkolo.Data.ShkoloContext context)
         {
-            // --- ADMINISTRATOR LOGIC ---
             if (user.Role == Role.Administrator)
             {
                 if (choice == "1")
@@ -104,59 +119,73 @@ namespace Shkolo.App
                 }
                 else if (choice == "2")
                 {
-                    Console.Write("Username to block: "); string target = Console.ReadLine();
-                    Console.WriteLine(uService.ChangeUserStatus(target, UserStatus.Blocked) ? "Blocked." : "Failed.");
+                    Console.Write("Username to block: ");
+                    string target = Console.ReadLine();
+                    if (!string.IsNullOrEmpty(target))
+                        Console.WriteLine(uService.ChangeUserStatus(target, UserStatus.Blocked) ? "User blocked." : "User not found.");
                 }
                 else if (choice == "3")
                 {
-                    Console.Write("Username to delete: "); string target = Console.ReadLine();
-                    Console.WriteLine(uService.DeleteUser(target) ? "Deleted." : "Failed.");
+                    Console.Write("Username to delete: ");
+                    string target = Console.ReadLine();
+                    if (!string.IsNullOrEmpty(target))
+                        Console.WriteLine(uService.DeleteUser(target) ? "User deleted." : "Failed.");
                 }
             }
-            // --- REGISTERED USER LOGIC ---
             else if (user.Role == Role.RegisteredUser)
             {
                 switch (choice)
                 {
                     case "1":
-                        Console.Write("Enter JSON path: ");
-                        Console.WriteLine(importer.ImportFromJson(Console.ReadLine()));
+                        // JSON Import Requirement
+                        Console.Write("Enter path (e.g. data.json): ");
+                        string path = Console.ReadLine();
+                        Console.WriteLine(importer.ImportFromJson(path));
                         break;
                     case "2":
+                        // JSON Export Requirement
                         Console.WriteLine(importer.ExportTopStudentsToJson("top_students.json"));
                         break;
                     case "3":
-                        Console.Write("Enter name: ");
+                        // LINQ Query: Search by criteria
+                        Console.Write("Search name: ");
                         var search = importer.SearchStudentsByName(Console.ReadLine());
-                        search.ForEach(s => Console.WriteLine($"{s.FirstName} {s.LastName} ({s.ClassName})"));
+                        search.ForEach(s => Console.WriteLine($"{s.FullName} ({s.ClassName})"));
                         break;
                     case "4":
+                        // LINQ Query: Aggregation (GPA)
                         var tops = importer.GetTopStudents(5);
                         tops.ForEach(t => Console.WriteLine($"{t.FullName}: {t.AverageGrade:F2}"));
                         break;
                     case "5":
-                        Console.Write("Enter Class (e.g. 12A): ");
+                        // LINQ Query: Filtering
+                        Console.Write("Class: ");
                         var classList = importer.GetStudentsByClass(Console.ReadLine());
-                        classList.ForEach(s => Console.WriteLine($"{s.FirstName} {s.LastName}"));
+                        classList.ForEach(s => Console.WriteLine($"- {s.FullName}"));
                         break;
                     case "6":
+                        // LINQ Query: Grouping
                         var popular = importer.GetPopularSubjects();
                         foreach (var p in popular) Console.WriteLine($"{p.Name}: {p.StudentCount} students");
                         break;
                     case "7":
-                        importer.GetFailingStudents().ForEach(s => Console.WriteLine($"FAILING: {s.FirstName} {s.LastName}"));
+                        // LINQ Query: Selection
+                        importer.GetFailingStudents().ForEach(s => Console.WriteLine($"ALERT: {s.FullName} has low grades!"));
                         break;
                     case "8":
+                        // LINQ Query: Date filtering
                         var recent = importer.GetRecentGrades();
-                        foreach (var r in recent) Console.WriteLine($"[{r.Subject}] {r.Student}: {r.Value}");
+                        foreach (var r in recent)
+                            Console.WriteLine($"[{r.Date:d}] {r.Subject}: {r.Student} got {r.Value}");
                         break;
                 }
             }
-            // --- GUEST LOGIC ---
             else if (user.Role == Role.Guest && choice == "1")
             {
-                // Simple read-only logic
-                Console.WriteLine("Displaying public school classes...");
+                // Read-only info for Guest
+                var classes = importer.GetPublicClasses();
+                if (!classes.Any()) Console.WriteLine("No classes found.");
+                classes.ForEach(c => Console.WriteLine($" * {c}"));
             }
         }
     }

@@ -20,7 +20,7 @@ public class UserConfig : IEntityTypeConfiguration<User>
             Status = UserStatus.Active
         });
 
-        // Seed a Registered User (the one who does CRUD/JSON)
+        // Seed a Registered User (tihs the one who does CRUD/JSON)
         builder.HasData(new User
         {
             Id = 2,

@@ -1,8 +1,13 @@
 ﻿using Shkolo.Data.Entities.Enums;
 
-public class UserDto
+namespace Shkolo.Data.DTOs
 {
-    public string Username { get; set; } = null!;
-    public Role Role { get; set; }
-    public UserStatus Status { get; set; }
+    public class UserDto
+    {
+        public string Username { get; set; } = null!;
+        public Role Role { get; set; }
+        public UserStatus Status { get; set; }
+
+        //Added UserStatus
+    }
 }
