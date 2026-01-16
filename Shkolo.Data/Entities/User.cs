@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using Shkolo.Data.Entities.Enums;
 
 namespace Shkolo.Data.Entities
 {
-
     public class User
     {
         [Key]
         public int Id { get; set; }
 
-        [Required, MaxLength(50)]
+        [Required]
+        [MaxLength(50)]
+        // Requirement: Username must be unique
         public string Username { get; set; } = null!;
 
         [Required]
@@ -20,6 +18,8 @@ namespace Shkolo.Data.Entities
 
         [Required]
         public Role Role { get; set; }
+
+        // Requirement: Status (Active/Blocked)
         public UserStatus Status { get; set; } = UserStatus.Active;
     }
 }

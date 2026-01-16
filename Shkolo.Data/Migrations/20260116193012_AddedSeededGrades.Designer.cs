@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Shkolo.Data;
 
@@ -11,9 +12,11 @@ using Shkolo.Data;
 namespace Shkolo.Data.Migrations
 {
     [DbContext(typeof(ShkoloContext))]
-    partial class ShkoloContextModelSnapshot : ModelSnapshot
+    [Migration("20260116193012_AddedSeededGrades")]
+    partial class AddedSeededGrades
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -54,6 +57,35 @@ namespace Shkolo.Data.Migrations
                     b.HasIndex("TeacherId");
 
                     b.ToTable("Grades");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            DateGiven = new DateTime(2026, 1, 11, 21, 30, 11, 294, DateTimeKind.Local).AddTicks(576),
+                            StudentId = 1,
+                            SubjectId = 1,
+                            TeacherId = 1,
+                            Value = 5.5
+                        },
+                        new
+                        {
+                            Id = 2,
+                            DateGiven = new DateTime(2026, 1, 14, 21, 30, 11, 294, DateTimeKind.Local).AddTicks(1107),
+                            StudentId = 1,
+                            SubjectId = 2,
+                            TeacherId = 1,
+                            Value = 6.0
+                        },
+                        new
+                        {
+                            Id = 3,
+                            DateGiven = new DateTime(2026, 1, 16, 21, 30, 11, 294, DateTimeKind.Local).AddTicks(1111),
+                            StudentId = 1,
+                            SubjectId = 1,
+                            TeacherId = 1,
+                            Value = 4.75
+                        });
                 });
 
             modelBuilder.Entity("Shkolo.Data.Entities.SchoolClass", b =>
@@ -71,6 +103,13 @@ namespace Shkolo.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("SchoolClasses");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "12A"
+                        });
                 });
 
             modelBuilder.Entity("Shkolo.Data.Entities.Student", b =>
@@ -83,13 +122,11 @@ namespace Shkolo.Data.Migrations
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("SchoolClassId")
                         .HasColumnType("int");
@@ -99,6 +136,15 @@ namespace Shkolo.Data.Migrations
                     b.HasIndex("SchoolClassId");
 
                     b.ToTable("Students");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            FirstName = "Ivan",
+                            LastName = "Ivanov",
+                            SchoolClassId = 1
+                        });
                 });
 
             modelBuilder.Entity("Shkolo.Data.Entities.Subject", b =>
@@ -117,6 +163,18 @@ namespace Shkolo.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Subjects");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Mathematics"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "History"
+                        });
                 });
 
             modelBuilder.Entity("Shkolo.Data.Entities.Teacher", b =>
@@ -138,6 +196,14 @@ namespace Shkolo.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Teachers");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            FirstName = "Teacher",
+                            LastName = "One"
+                        });
                 });
 
             modelBuilder.Entity("Shkolo.Data.Entities.User", b =>
@@ -165,27 +231,32 @@ namespace Shkolo.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Username")
-                        .IsUnique();
-
                     b.ToTable("Users");
 
                     b.HasData(
                         new
                         {
                             Id = 1,
-                            Password = "adminpassword",
+                            Password = "123",
                             Role = 2,
                             Status = 0,
-                            Username = "admin"
+                            Username = "teacher"
                         },
                         new
                         {
                             Id = 2,
-                            Password = "userpassword",
+                            Password = "123",
                             Role = 1,
                             Status = 0,
-                            Username = "user1"
+                            Username = "ivan"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Password = "123",
+                            Role = 0,
+                            Status = 0,
+                            Username = "guest"
                         });
                 });
 

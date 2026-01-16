@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Shkolo.Data.Entities.Enums;
 
-namespace Shkolo.Data.DTOs
+public class UserDto
 {
-    public class UserDto
-    {
-        public string Username { get; set; } = null!;
-        public string Role { get; set; } = null!;
-    }
+    public string Username { get; set; } = null!;
+    public Role Role { get; set; }
+    public UserStatus Status { get; set; }
 }

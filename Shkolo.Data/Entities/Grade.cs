@@ -6,7 +6,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Shkolo.Data.Entities
 {
-
     public class Grade
     {
         [Key]

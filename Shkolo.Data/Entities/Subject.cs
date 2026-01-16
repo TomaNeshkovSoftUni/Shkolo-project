@@ -5,7 +5,6 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Shkolo.Data.Entities
 {
-
     public class Subject
     {
         [Key]

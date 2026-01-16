@@ -1,11 +1,11 @@
 ﻿using Newtonsoft.Json;
 using Shkolo.Data.DTOs;
-using Shkolo.Data.ShkoloDbContext;
 using Shkolo.Data.Entities;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace Shkolo.Data.Services
 {
@@ -15,96 +15,135 @@ namespace Shkolo.Data.Services
 
         public DataImporterService(ShkoloContext context)
         {
-            // Always use the injected context
             _context = context;
         }
 
+        // --- 1. JSON IMPORT ---
         public string ImportFromJson(string filePath)
         {
-            // 1. Check if the file actually exists
-            if (!File.Exists(filePath))
-                return $"Error: File not found at {Path.GetFullPath(filePath)}";
+            if (!File.Exists(filePath)) return "Error: File not found.";
 
-            // 2. Read the text and turn it into C# objects (DTOs)
             var json = File.ReadAllText(filePath);
-            var studentDtos = JsonConvert.DeserializeObject<List<StudentImportDto>>(json);
+            var dtos = JsonConvert.DeserializeObject<List<StudentImportDto>>(json);
 
-            if (studentDtos == null || !studentDtos.Any())
-                return "Error: JSON file is empty or corrupted.";
+            if (dtos == null) return "Error: Invalid JSON structure.";
 
-            // 3. Prepare a "System" Teacher for the grades
-            var teacher = _context.Teachers.FirstOrDefault();
-            if (teacher == null)
+            int importedCount = 0;
+            foreach (var dto in dtos)
             {
-                teacher = new Teacher { FirstName = "System", LastName = "Importer" };
-                _context.Teachers.Add(teacher);
-                _context.SaveChanges();
-            }
+                // Requirement: Validation (Base check)
+                if (string.IsNullOrWhiteSpace(dto.FirstName) || string.IsNullOrWhiteSpace(dto.LastName)) continue;
 
-            // 4. Loop through each student in the JSON
-            foreach (var sDto in studentDtos)
-            {
-                // Safety Check: If the JSON key didn't match 'Class', skip or handle error
-                if (string.IsNullOrEmpty(sDto.Class))
-                {
-                    continue; // Or throw an exception to debug
-                }
-
-                // Find or Create the Class (e.g., "10A")
-                var schoolClass = _context.SchoolClasses
-                    .FirstOrDefault(c => c.Name == sDto.Class);
-
-                if (schoolClass == null)
-                {
-                    schoolClass = new SchoolClass { Name = sDto.Class };
-                    _context.SchoolClasses.Add(schoolClass);
-                    _context.SaveChanges();
-                }
-
-                // Create the Student and link to Class
                 var student = new Student
                 {
-                    FirstName = sDto.FirstName,
-                    LastName = sDto.LastName,
-                    SchoolClassId = schoolClass.Id
+                    FirstName = dto.FirstName,
+                    LastName = dto.LastName
                 };
 
-                _context.Students.Add(student);
-                _context.SaveChanges(); // Save to get the student.Id for the grades
-
-                // 5. Loop through the student's grades (matching the 'Grades' property in DTO)
-                if (sDto.Grades != null)
+                // Logic to find/create class from JSON
+                var schoolClass = _context.SchoolClasses.FirstOrDefault(c => c.Name == dto.Class);
+                if (schoolClass == null)
                 {
-                    foreach (var gDto in sDto.Grades)
-                    {
-                        // Find or Create the Subject (e.g., "Math")
-                        var subject = _context.Subjects
-                            .FirstOrDefault(sub => sub.Name == gDto.SubjectName);
-
-                        if (subject == null)
-                        {
-                            subject = new Subject { Name = gDto.SubjectName };
-                            _context.Subjects.Add(subject);
-                            _context.SaveChanges();
-                        }
-
-                        // Create the Grade record
-                        var grade = new Grade
-                        {
-                            Value = gDto.Score,
-                            StudentId = student.Id,
-                            SubjectId = subject.Id,
-                            TeacherId = teacher.Id,
-                            DateGiven = DateTime.Now
-                        };
-                        _context.Grades.Add(grade);
-                    }
+                    schoolClass = new SchoolClass { Name = dto.Class };
+                    _context.SchoolClasses.Add(schoolClass);
                 }
+                student.SchoolClass = schoolClass;
+
+                _context.Students.Add(student);
+                importedCount++;
             }
 
-            // 6. Final save for all the added grades
             _context.SaveChanges();
-            return "Successfully imported all students, classes, and grades!";
+            return $"Successfully imported {importedCount} students!";
         }
+
+        // --- 2. JSON EXPORT ---
+        public string ExportTopStudentsToJson(string filePath)
+        {
+            // Requirement: Export a LINQ query result
+            var topStudents = GetTopStudents(10);
+            var json = JsonConvert.SerializeObject(topStudents, Formatting.Indented);
+            File.WriteAllText(filePath, json);
+            return $"Successfully exported data to {filePath}";
+        }
+
+        // --- 3. THE 8 MANDATORY LINQ QUERIES ---
+
+        // Query 1: Search by Criterion (FirstName or LastName)
+        public List<StudentDisplayDto> SearchStudentsByName(string search) =>
+            _context.Students
+                .Where(s => s.FirstName.Contains(search) || s.LastName.Contains(search))
+                .Select(s => new StudentDisplayDto
+                {
+                    FirstName = s.FirstName,
+                    LastName = s.LastName,
+                    ClassName = s.SchoolClass != null ? s.SchoolClass.Name : "No Class"
+                }).ToList();
+
+        // Query 2: Statistics (Top Students by Average Grade)
+        public List<StudentReportDto> GetTopStudents(int count) =>
+            _context.Students
+                .Select(s => new StudentReportDto
+                {
+                    FullName = s.FirstName + " " + s.LastName,
+                    AverageGrade = s.Grades.Any() ? s.Grades.Average(g => g.Value) : 0
+                })
+                .OrderByDescending(s => s.AverageGrade)
+                .Take(count)
+                .ToList();
+
+        // Query 3: Filtering by Class
+        public List<StudentDisplayDto> GetStudentsByClass(string className) =>
+            _context.Students
+                .Where(s => s.SchoolClass.Name == className)
+                .Select(s => new StudentDisplayDto
+                {
+                    FirstName = s.FirstName,
+                    LastName = s.LastName,
+                    ClassName = s.SchoolClass.Name
+                }).ToList();
+
+        // Query 4: Many-to-Many check (Popularity)
+        public dynamic GetPopularSubjects() =>
+            _context.Subjects
+                .OrderByDescending(sub => sub.Students.Count)
+                .Select(sub => new { sub.Name, StudentCount = sub.Students.Count })
+                .ToList();
+
+        // Query 5: Failing Students
+        public List<StudentDisplayDto> GetFailingStudents() =>
+            _context.Students
+                .Where(s => s.Grades.Any(g => g.Value < 3.00))
+                .Select(s => new StudentDisplayDto
+                {
+                    FirstName = s.FirstName,
+                    LastName = s.LastName,
+                    ClassName = s.SchoolClass.Name
+                }).ToList();
+
+        // Query 6: Grouping (Grades per Subject)
+        public dynamic GetGradeCountsBySubject() =>
+            _context.Grades
+                .GroupBy(g => g.Subject.Name)
+                .Select(group => new { Subject = group.Key, Count = group.Count() })
+                .ToList();
+
+        // Query 7: Date-based query (Last 30 days)
+        public dynamic GetRecentGrades() =>
+            _context.Grades
+                .Where(g => g.DateGiven >= DateTime.Now.AddDays(-30))
+                .Select(g => new { Student = g.Student.FirstName, g.Value, Subject = g.Subject.Name })
+                .ToList();
+
+        // Query 8: Empty/Null Check (Students with no grades)
+        public List<StudentDisplayDto> GetStudentsWithNoGrades() =>
+            _context.Students
+                .Where(s => !s.Grades.Any())
+                .Select(s => new StudentDisplayDto
+                {
+                    FirstName = s.FirstName,
+                    LastName = s.LastName,
+                    ClassName = s.SchoolClass != null ? s.SchoolClass.Name : "N/A"
+                }).ToList();
     }
 }

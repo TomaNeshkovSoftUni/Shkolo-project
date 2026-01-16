@@ -6,7 +6,6 @@ using System.Diagnostics;
 
 namespace Shkolo.Data.Entities
 {
-
     public class Teacher
     {
         public int Id { get; set; }
@@ -16,6 +15,7 @@ namespace Shkolo.Data.Entities
 
         [Required]
         public string LastName { get; set; } = null!;
+
         public virtual ICollection<Grade> Grades { get; set; } = new List<Grade>();
     }
 }

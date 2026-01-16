@@ -6,8 +6,8 @@ namespace Shkolo.Data.Entities.Enums
 {
     public enum Role
     {
-        Guest,
-        Student,
-        Teacher
+        Guest = 0,
+        RegisteredUser = 1,
+        Administrator = 2 
     }
 }

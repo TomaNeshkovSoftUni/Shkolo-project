@@ -5,7 +5,6 @@ using Shkolo.Data.Entities.Enums;
 
 namespace Shkolo.Data
 {
-    // Changed to public and renamed to match your file name
     public class ShkoloContext : DbContext
     {
         public ShkoloContext() { }
@@ -30,8 +29,13 @@ namespace Shkolo.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // This now points to ShkoloDbContext
+            base.OnModelCreating(modelBuilder);
+
+            // This automatically applies all configurations in the assembly
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ShkoloContext).Assembly);
+
+            // Note: If your Config folder is in a different assembly, 
+            // you can use: modelBuilder.ApplyConfiguration(new UserConfig()); for each one.
         }
     }
 }

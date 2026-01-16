@@ -1,30 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Shkolo.Data.Entities;
 using Shkolo.Data.Entities.Enums;
 
-
-namespace Shkolo.Data.ShkoloDbContext.Config
+public class UserConfig : IEntityTypeConfiguration<User>
 {
-    public class UserConfig : IEntityTypeConfiguration<User>
+    public void Configure(EntityTypeBuilder<User> builder)
     {
-        public void Configure(EntityTypeBuilder<User> builder)
-        {
-            // Unique Username
-            builder.HasIndex(u => u.Username).IsUnique();
+        // Requirement: Username is unique
+        builder.HasIndex(u => u.Username).IsUnique();
 
-            // Seed Admin
-            builder.HasData(new User
-            {
-                Id = 1,
-                Username = "admin",
-                Password = "password123",
-                Role = Role.Teacher,
-                Status = UserStatus.Active
-            });
-        }
+        // Seed the mandatory Administrator
+        builder.HasData(new User
+        {
+            Id = 1,
+            Username = "admin",
+            Password = "adminpassword",
+            Role = Role.Administrator, // Updated role
+            Status = UserStatus.Active
+        });
+
+        // Seed a Registered User (the one who does CRUD/JSON)
+        builder.HasData(new User
+        {
+            Id = 2,
+            Username = "user1",
+            Password = "userpassword",
+            Role = Role.RegisteredUser, // Updated role
+            Status = UserStatus.Active
+        });
     }
 }
