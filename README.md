@@ -1,21 +1,28 @@
-There's a seeded admin account. Username is "admin" and the pass is "adminpassword".
+Credentials: 
+1) Admin - username: "admin"; pass: "adminpassword"
+2) User - username: "user1"; pass: "userpassword"
 
-example JSON structure:
+!! update the connection string in ShkoloContext.cs if your SQL instance isn't Server=..
+!! Initialize: Run Update-Database in the Package Manager Console.
 
-[
-  {
-    "FirstName": "Daniela",
-    "LastName": "Marinova",
-    "Class": "10B",
-    "Grades": [
-      {
-        "SubjectName": "History",
-        "Score": 5
-      },
-      {
-        "SubjectName": "Biology",
-        "Score": 6
-      }
-    ]
-  }
-]
+JSON file must be an array. example structure:
+
+```
+ {
+     "FirstName": "Daniela",
+     "LastName": "Marinova",
+     "Class": "10B",
+     "Grades": [
+         {
+             "SubjectName": "History",
+             "Score": 5
+         },
+         {
+             "SubjectName": "Biology",
+             "Score": 6
+         }
+     ]
+ },
+```
+
+*_this is a school project_
