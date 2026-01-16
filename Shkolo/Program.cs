@@ -9,7 +9,7 @@ using Shkolo.Data.ShkoloDbContext;
 
 namespace Shkolo.App
 {
-    // This is the App layer (ProjectName.App)
+    // This is the App layer! (ProjectName.App)
     // It only handles the console and DTOs, never the raw database Entities
     class Program
     {
@@ -22,7 +22,7 @@ namespace Shkolo.App
 
             UserDto loggedInUser = null;
 
-            // START SCREEN: Login / Register / Guest logic
+            // Login screen logic
             while (loggedInUser == null)
             {
                 Console.Clear();
@@ -39,7 +39,7 @@ namespace Shkolo.App
                     Console.Write("Username: "); string u = Console.ReadLine();
                     Console.Write("Password: "); string p = Console.ReadLine();
 
-                    // Auth returns a DTO to keep the App layer clean
+                    // returns a DTO to keep the App layer looking clean
                     loggedInUser = userService.Authenticate(u, p);
 
                     if (loggedInUser == null)
@@ -57,13 +57,13 @@ namespace Shkolo.App
                 }
                 else if (entry == "3")
                 {
-                    // Guest role has limited menu options
+                    // Guest role has less menu options
                     loggedInUser = new UserDto { Username = "Guest", Role = Role.Guest };
                 }
                 else if (entry == "0") return;
             }
 
-            // MAIN MENU: Different options show up depending on User Role
+            // MAIN MENU:
             while (true)
             {
                 Console.Clear();
@@ -72,14 +72,14 @@ namespace Shkolo.App
 
                 if (loggedInUser.Role == Role.Administrator)
                 {
-                    // Admin can ONLY manage users, no school data access
+                    // Admin can ONLY manage users - no data import/export or reports
                     Console.WriteLine("1. List All Users");
                     Console.WriteLine("2. Block User");
                     Console.WriteLine("3. Delete User");
                 }
                 else if (loggedInUser.Role == Role.RegisteredUser)
                 {
-                    // Registered Users get JSON import/export and all LINQ reports
+                    // Registered Users get JSON import/export and all LINQ reports - no user management
                     Console.WriteLine("1. Import Students (JSON)");
                     Console.WriteLine("2. Export Top Students (JSON)");
                     Console.WriteLine("3. Search Student by Name");
@@ -91,7 +91,7 @@ namespace Shkolo.App
                 }
                 else if (loggedInUser.Role == Role.Guest)
                 {
-                    // Guests only see read-only public info
+                    // Guests only access school classes - read-only
                     Console.WriteLine("1. View School Classes");
                 }
 

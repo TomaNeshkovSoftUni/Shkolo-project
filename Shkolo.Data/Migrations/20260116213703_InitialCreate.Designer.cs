@@ -12,8 +12,8 @@ using Shkolo.Data;
 namespace Shkolo.Data.Migrations
 {
     [DbContext(typeof(ShkoloContext))]
-    [Migration("20260116204255_FixRelationshipsAndMissingCollections")]
-    partial class FixRelationshipsAndMissingCollections
+    [Migration("20260116213703_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
